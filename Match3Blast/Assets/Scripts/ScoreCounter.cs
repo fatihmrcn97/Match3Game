@@ -1,16 +1,9 @@
 using UnityEngine;
 using TMPro;
 
-public sealed class ScoreCounter : MonoBehaviour
+public sealed class ScoreCounter : SingletonMonoBehaviour<ScoreCounter>
 {
-   
-    public static ScoreCounter Instance { get; private set; }
-
-    private void Awake()
-    {
-        Instance = this;
-    }
-
+     
     private int _score;
 
     public int Score

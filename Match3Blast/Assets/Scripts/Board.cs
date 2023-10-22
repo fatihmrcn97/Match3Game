@@ -7,13 +7,8 @@ using DG.Tweening;
 using System;
 using Random = UnityEngine.Random;
 
-public sealed class Board : MonoBehaviour
-{
-    public static Board Instance { get; private set;}
-    private void Awake() => Instance = this;
-
-    public Row[] rows;
-
+public sealed class Board : SingletonMonoBehaviour<Board>
+{ 
     public Tile[,] Tiles { get; private set; }
 
     public int Width => Tiles.GetLength(0);
@@ -23,6 +18,7 @@ public sealed class Board : MonoBehaviour
 
     private const float TweenDuration = 0.25f;
 
+    [SerializeField] private Row[] rows;
     [SerializeField] private AudioClip popSound;
     [SerializeField] private AudioSource audioSource;
 
@@ -41,9 +37,7 @@ public sealed class Board : MonoBehaviour
                 tile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
 
                 Tiles[x, y] = tile;
-            }
-        
-
+            } 
     }
 
 
@@ -60,6 +54,12 @@ public sealed class Board : MonoBehaviour
             }
             else
             {
+                if(tile.Item.isBonus)
+                {
+                    StartCoroutine(PopAllAround(tile));
+                    _selection.Clear();
+                    return;
+                }
                 _selection.Add(tile);
             }
 
@@ -125,10 +125,13 @@ public sealed class Board : MonoBehaviour
         {
             for (int x = 0; x < Width; x++)
             {
+                var canBonusCreate=false;
                 var tile = Tiles[x, y];
 
                 var connectedTiles = tile.GetConnectedTiles();
                 if (connectedTiles.Skip(1).Count() < 2) continue;
+
+                if (connectedTiles.Skip(1).Count() > 2) canBonusCreate = true;
 
                 var deflateSequence = DOTween.Sequence();
 
@@ -147,8 +150,17 @@ public sealed class Board : MonoBehaviour
 
                 foreach (var connectedTile in connectedTiles)
                 {
-                    connectedTile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
-                    inflateSequence.Join(connectedTile.icon.transform.DOScale(Vector3.one, TweenDuration));
+                    if(canBonusCreate)
+                    {
+                        connectedTile.Item = ItemDatabase.BonusItem[Random.Range(0, ItemDatabase.BonusItem.Length)];
+                        inflateSequence.Join(connectedTile.icon.transform.DOScale(Vector3.one, TweenDuration));
+                        canBonusCreate = false;
+                    }
+                    else
+                    { 
+                        connectedTile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
+                        inflateSequence.Join(connectedTile.icon.transform.DOScale(Vector3.one, TweenDuration));
+                    }
                 }
 
                 await inflateSequence.Play().AsyncWaitForCompletion();
@@ -157,5 +169,23 @@ public sealed class Board : MonoBehaviour
                 y = 0;
             }
         }
+    }
+
+
+    private IEnumerator PopAllAround(Tile tile) {
+
+        var neigbours = tile.AllNeighbours;
+        foreach (var item in neigbours)
+        {
+            if (item == null) continue;
+            
+            item.icon.transform.DOScale(Vector3.zero, TweenDuration); 
+            ScoreCounter.Instance.Score += tile.Item.value; 
+            audioSource.PlayOneShot(popSound);
+            yield return new WaitForSeconds(.5f);
+            item.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
+            item.icon.transform.DOScale(Vector3.one, TweenDuration);
+        } 
+        tile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
     }
 }

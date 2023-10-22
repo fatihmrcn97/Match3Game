@@ -7,4 +7,5 @@ public sealed class Item : ScriptableObject
 
     public Sprite sprite;
 
+    public bool isBonus;
 }
