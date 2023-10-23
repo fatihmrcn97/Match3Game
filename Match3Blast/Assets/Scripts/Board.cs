@@ -152,7 +152,7 @@ public sealed class Board : SingletonMonoBehaviour<Board>
                 {
                     if(canBonusCreate)
                     {
-                        connectedTile.Item = ItemDatabase.BonusItem[Random.Range(0, ItemDatabase.BonusItem.Length)];
+                        connectedTile.Item = ItemDatabase.BonusItem[0];
                         inflateSequence.Join(connectedTile.icon.transform.DOScale(Vector3.one, TweenDuration));
                         canBonusCreate = false;
                     }
@@ -174,11 +174,13 @@ public sealed class Board : SingletonMonoBehaviour<Board>
 
     private IEnumerator PopAllAround(Tile tile) {
 
+        FXController.Instance.CreateBombFX(tile.transform.position);
+
         var neigbours = tile.AllNeighbours;
         foreach (var item in neigbours)
         {
             if (item == null) continue;
-            
+            Debug.Log(item.name+" "+item.x+" "+item.y);
             item.icon.transform.DOScale(Vector3.zero, TweenDuration); 
             ScoreCounter.Instance.Score += tile.Item.value; 
             audioSource.PlayOneShot(popSound);
