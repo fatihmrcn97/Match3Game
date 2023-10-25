@@ -21,7 +21,7 @@ public sealed class Board : SingletonMonoBehaviour<Board>
     [SerializeField] private Row[] rows;
     [SerializeField] private AudioClip popSound;
     [SerializeField] private AudioSource audioSource;
-
+    [SerializeField] private GameObject explosionPref;
     private void Start()
     {
         Tiles = new Tile[rows.Max(row => row.tiles.Length), rows.Length];
@@ -138,6 +138,7 @@ public sealed class Board : SingletonMonoBehaviour<Board>
                 foreach (var conntectedTile in connectedTiles)
                 {
                     deflateSequence.Join(conntectedTile.icon.transform.DOScale(Vector3.zero, TweenDuration));
+                    conntectedTile.Item.ExlosionEffect(explosionPref, conntectedTile.transform);
                 }
 
                 ScoreCounter.Instance.Score += tile.Item.value * connectedTiles.Count;
@@ -158,8 +159,9 @@ public sealed class Board : SingletonMonoBehaviour<Board>
                     }
                     else
                     { 
+                   
                         connectedTile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
-                        inflateSequence.Join(connectedTile.icon.transform.DOScale(Vector3.one, TweenDuration));
+                        inflateSequence.Join(connectedTile.icon.transform.DOScale(Vector3.one, TweenDuration)); 
                     }
                 }
 
@@ -174,8 +176,9 @@ public sealed class Board : SingletonMonoBehaviour<Board>
 
     private IEnumerator PopAllAround(Tile tile) {
 
-        FXController.Instance.CreateBombFX(tile.transform.position);
+        //FXController.Instance.CreateBombFX(tile.transform.position);
 
+        tile.Item.ExlosionEffect(explosionPref,tile.transform);
         var neigbours = tile.AllNeighbours;
         foreach (var item in neigbours)
         {

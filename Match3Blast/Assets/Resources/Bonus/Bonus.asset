@@ -15,3 +15,11 @@ MonoBehaviour:
   value: 100
   sprite: {fileID: 21300000, guid: 6986e1523147f8349a195fda3eff6a83, type: 3}
   isBonus: 1
+  explosionSprites:
+  - {fileID: 21300000, guid: a8fd2fa946291894ebc171d22e9d88ed, type: 3}
+  - {fileID: 21300000, guid: 1757590db576ef44ebc6474c8e74c487, type: 3}
+  - {fileID: 21300000, guid: 0ed20359bd4c8ba45abd7ed39ccd6b94, type: 3}
+  - {fileID: 21300000, guid: a8fd2fa946291894ebc171d22e9d88ed, type: 3}
+  - {fileID: 21300000, guid: 1757590db576ef44ebc6474c8e74c487, type: 3}
+  - {fileID: 21300000, guid: 0ed20359bd4c8ba45abd7ed39ccd6b94, type: 3}
+  explosionForce: 500

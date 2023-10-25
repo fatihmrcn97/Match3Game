@@ -267,6 +267,7 @@ MonoBehaviour:
   - {fileID: 1789066460}
   popSound: {fileID: 8300000, guid: c8aefbb9f0986ad4f906129dea03e956, type: 3}
   audioSource: {fileID: 128847066}
+  explosionPref: {fileID: 3398354691514570406, guid: e5fdd5584250bf64eac5b813120d2339, type: 3}
 --- !u!82 &128847066
 AudioSource:
   m_ObjectHideFlags: 0
